@@ -1,0 +1,11 @@
+package com.demo.ecommerce.controller;
+
+import com.demo.ecommerce.common.BaseController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/order-details")
+public class OrderDetailController extends BaseController {
+
+}

@@ -4,5 +4,6 @@ public enum Currency {
     VND,
     USD,
     YEN,
-    EUR
+    EUR,
+    WON
 }
