@@ -26,4 +26,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = RuntimeException.class)
+    public ResponseEntity<ApiResponse<Map<String,String>>> handleRuntimeException(RuntimeException ex){
+
+        Map<String,String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+
+        ApiResponse<Map<String,String>> body = ApiResponse.errorListDataMessages(400, "Error",errorResponse);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }

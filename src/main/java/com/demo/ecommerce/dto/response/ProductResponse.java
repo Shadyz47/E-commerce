@@ -4,6 +4,8 @@ import com.demo.ecommerce.entity.Category;
 import com.demo.ecommerce.entity.Currency;
 import lombok.Builder;
 
+import java.util.List;
+
 @Builder
 public record ProductResponse(
         Long id,
@@ -12,6 +14,7 @@ public record ProductResponse(
         Double price,
         Integer quantity,
         Currency currency,
-        String categoryName
+        String categoryName,
+        List<String> imageUrls
 ) {
 }

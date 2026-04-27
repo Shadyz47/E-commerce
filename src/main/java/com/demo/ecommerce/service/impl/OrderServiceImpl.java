@@ -53,8 +53,8 @@ public class OrderServiceImpl implements OrderService {
 
             Product productDb = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
 
-            if(productDb.getQuantity() < orderDetail.getProduct().getQuantity()) {
-                throw new RuntimeException("Product quantity not enough");
+            if(quantity <= 0 || productDb.getQuantity() < quantity) {
+                throw new RuntimeException("Product quantity not enough or quantity must be greater than 0");
             }
 
             productDb.setQuantity(productDb.getQuantity() - quantity);
@@ -68,5 +68,78 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepo.save(order);
 
         return orderMapper.toResponse(savedOrder);
+    }
+
+    @Override
+    @Transactional
+    public void updateOrder(Long id, OrderRequest orderRequest) {
+
+        Order existedOrder = orderRepo.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+
+        existedOrder.setOrderDate(java.time.LocalDate.now());
+
+        //hoan tra so luong
+        for(OrderDetail orderDetail : existedOrder.getOrderDetails()){
+
+            Long productId = orderDetail.getProduct().getId();
+            Integer quantity = orderDetail.getTotalQuantity();
+
+            Product productDb = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+            productDb.setQuantity(productDb.getQuantity() + quantity);
+        }
+
+        orderMapper.updateOrderFromDto(orderRequest, existedOrder);
+
+        // xoa het cac chi tiet don hang cu ---> dan den tăng ID của orderDetail
+        existedOrder.getOrderDetails().clear();
+
+        Order orderFromRq = orderMapper.toEntity(orderRequest);
+
+        if (orderFromRq.getOrderDetails() == null || orderFromRq.getOrderDetails().isEmpty()) {
+            orderRepo.save(existedOrder);
+            return;
+        }
+
+        for(OrderDetail orderDetail : orderFromRq.getOrderDetails()) {
+
+            Long productId = orderDetail.getProduct().getId();
+            Integer quantity = orderDetail.getTotalQuantity();
+
+            Product productDb = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+            if(productDb.getQuantity() < quantity) {
+                throw new RuntimeException("Product quantity not enough");
+            }
+
+            productDb.setQuantity(productDb.getQuantity() - quantity);
+
+            orderDetail.setProduct(productDb);
+            orderDetail.setOrder(existedOrder);
+
+            orderDetail.setTotalPrice(productDb.getPrice() * quantity);
+
+            existedOrder.getOrderDetails().add(orderDetail);
+        }
+
+        orderRepo.save(existedOrder);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrder(Long id) {
+
+        Order existeOrder = orderRepo.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+
+        for(OrderDetail orderDetail : existeOrder.getOrderDetails()){
+
+            Product productDb = orderDetail.getProduct();
+            productDb.setQuantity(productDb.getQuantity() + orderDetail.getTotalQuantity());
+
+            productRepo.save(productDb);
+        }
+
+        existeOrder.getOrderDetails().clear();
+        orderRepo.delete(existeOrder);
     }
 }

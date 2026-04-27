@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Builder
 public record ProductRequest(
@@ -28,6 +31,8 @@ public record ProductRequest(
         Integer status,
 
         @NotBlank(message = "categoryName not be null !")
-        String categoryName
+        String categoryName,
+
+        List<MultipartFile> files
 ) {
 }

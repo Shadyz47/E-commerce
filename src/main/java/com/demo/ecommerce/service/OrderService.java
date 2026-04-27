@@ -10,4 +10,8 @@ public interface OrderService {
     List<OrderResponse> getAllOrders();
 
     OrderResponse placeOrder(OrderRequest  orderRequest);
+
+    void updateOrder(Long id, OrderRequest orderRequest);
+
+    void deleteOrder(Long id);
 }

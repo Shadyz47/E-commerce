@@ -12,4 +12,6 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
 
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.category WHERE p.status=1")
     List<Product> findAllWithQuery();
+
+    boolean existsByName(String productName);
 }
