@@ -24,4 +24,8 @@ public record ApiResponse<T>(
     public static <T> ApiResponse<T> found(T data){
         return new ApiResponse<T>(200, "Found !!", data);
     }
+
+    public static <T> ApiResponse<T> loginSuccess(T data){
+        return new ApiResponse<T>(200, "login successfully", data);
+    }
 }

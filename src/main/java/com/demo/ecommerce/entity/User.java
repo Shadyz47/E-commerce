@@ -53,8 +53,13 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
-        return "";
+    public @NonNull String getUsername() {
+        return userName;
+    }
+
+    @Override
+    public @NonNull String getPassword() {
+        return password;
     }
 
     @Override

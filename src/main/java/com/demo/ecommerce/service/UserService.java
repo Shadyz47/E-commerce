@@ -7,5 +7,5 @@ import com.demo.ecommerce.dto.response.UserResponse;
 public interface UserService {
     UserResponse register(UserRequest userRequest);
 
-    void login(UserLoginRequest userLoginRequest);
+    String login(UserLoginRequest userLoginRequest);
 }

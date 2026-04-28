@@ -8,6 +8,7 @@ import com.demo.ecommerce.entity.User;
 import com.demo.ecommerce.mapper.UserMapper;
 import com.demo.ecommerce.repository.RoleRepo;
 import com.demo.ecommerce.repository.UserRepo;
+import com.demo.ecommerce.security.JwtTokenUtil;
 import com.demo.ecommerce.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,14 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepo roleRepo;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    public UserServiceImpl(UserRepo userRepo, UserMapper userMapper, PasswordEncoder passwordEncoder, RoleRepo roleRepo) {
+    public UserServiceImpl(UserRepo userRepo, UserMapper userMapper, PasswordEncoder passwordEncoder, RoleRepo roleRepo, JwtTokenUtil jwtTokenUtil) {
         this.userRepo = userRepo;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.roleRepo = roleRepo;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @Override
@@ -42,7 +45,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void login(UserLoginRequest userLoginRequest) {
+    public String login(UserLoginRequest userLoginRequest) {
+
         User user = userRepo.findByUserName(userLoginRequest.userName()).orElseThrow(
                 () -> new RuntimeException("User not found")
         );
@@ -50,5 +54,7 @@ public class UserServiceImpl implements UserService {
         if(!passwordEncoder.matches(userLoginRequest.password(),user.getPassword())) {
             throw new RuntimeException("Password is incorrect");
         }
+
+        return jwtTokenUtil.generateToken(user);
     }
 }

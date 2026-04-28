@@ -1,5 +1,7 @@
 package com.demo.ecommerce.controller;
 
+import com.demo.ecommerce.common.ApiResponse;
+import com.demo.ecommerce.common.BaseController;
 import com.demo.ecommerce.dto.request.UserLoginRequest;
 import com.demo.ecommerce.dto.request.UserRequest;
 import com.demo.ecommerce.dto.response.UserResponse;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController extends BaseController {
 
     private final UserService userService;
 
@@ -30,9 +32,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginRequest userLoginRequest){
+    public ResponseEntity<ApiResponse<String>> login(@RequestBody UserLoginRequest userLoginRequest){
 
-        userService.login(userLoginRequest);
-        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+        String token = userService.login(userLoginRequest);
+        return new ResponseEntity<>(ApiResponse.loginSuccess(token), HttpStatus.OK);
     }
 }
