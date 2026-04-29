@@ -11,6 +11,7 @@ import org.mapstruct.MappingConstants;
 public interface UserMapper {
 
     @Mapping(source = "role.roleName", target = "roleName")
+    @Mapping(source = "username", target = "userName")
     UserResponse toResponse(User user);
 
     @Mapping(source = "roleId", target = "role.id")

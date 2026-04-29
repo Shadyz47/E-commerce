@@ -13,9 +13,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
+    private static final Set<String> PUBLIC_POST_ENDPOINTS = Set.of(
+            "/api/users/login",
+            "/api/users/register"
+    );
 
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailService userDetailService;
@@ -23,6 +29,22 @@ public class JwtFilter extends OncePerRequestFilter {
     public JwtFilter(JwtTokenUtil jwtTokenUtil, UserDetailService userDetailService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailService = userDetailService;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+        if ("POST".equalsIgnoreCase(method) && PUBLIC_POST_ENDPOINTS.contains(path)) {
+            return true;
+        }
+
+        return "GET".equalsIgnoreCase(method) && path.startsWith("/api/products");
     }
 
     @Override
@@ -41,10 +63,10 @@ public class JwtFilter extends OncePerRequestFilter {
             final String token = authHeader.substring(7);
             final String username = jwtTokenUtil.extractUsername(token);
 
-            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailService.loadUserByUsername(username);
 
-                if(jwtTokenUtil.validateToken(token, userDetails)){
+                if (jwtTokenUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
 
@@ -53,8 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED");
         }
     }

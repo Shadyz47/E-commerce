@@ -36,9 +36,14 @@ public class UserServiceImpl implements UserService {
         Role role = roleRepo.findById(userRequest.roleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
+        if (userRepo.findByUserName(userRequest.userName()).isPresent()) {
+            throw new RuntimeException("User already exists");
+        }
+
         User user = userMapper.toEntity(userRequest);
         user.setPassword(passwordEncoder.encode(userRequest.password()));
         user.setRole(role);
+        user.setActive(true);
         userRepo.save(user);
 
         return userMapper.toResponse(user);
