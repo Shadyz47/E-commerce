@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return true;
         }
 
-        return "GET".equalsIgnoreCase(method) && path.startsWith("/api/products");
+        return "GET".equalsIgnoreCase(method) && "/api/categories".equals(path);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             final String authHeader = request.getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED");
+                filterChain.doFilter(request, response);
                 return;
             }
 

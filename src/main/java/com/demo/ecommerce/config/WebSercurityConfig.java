@@ -1,7 +1,6 @@
 package com.demo.ecommerce.config;
 
 import com.demo.ecommerce.security.JwtFilter;
-import com.demo.ecommerce.security.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,12 +34,12 @@ public class WebSercurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .exceptionHandling(ex -> ex
-//                        .authenticationEntryPoint((request, response, authException) ->
-//                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED"))
-//                        .accessDeniedHandler((request, response, accessDeniedException) ->
-//                                response.sendError(HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN"))
-//                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN"))
+                )
                 //.httpBasic(Customizer.withDefaults());
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
