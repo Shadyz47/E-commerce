@@ -8,4 +8,6 @@ public interface UserService {
     UserResponse register(UserRequest userRequest);
 
     String login(UserLoginRequest userLoginRequest);
+
+    void deleteUserById(Long id);
 }

@@ -17,7 +17,6 @@ public record UserRequest(
         String password,
         String phoneNumber,
         String email,
-        Date dateOfBirth,
-        Long roleId
+        Date dateOfBirth
 ) {
 }

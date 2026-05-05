@@ -33,12 +33,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse register(UserRequest userRequest) {
 
-        Role role = roleRepo.findById(userRequest.roleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-
         if (userRepo.findByUserName(userRequest.userName()).isPresent()) {
             throw new RuntimeException("User already exists");
         }
+
+        Role role = roleRepo.findByRoleName(Role.USER).orElseThrow(
+                () -> new RuntimeException("Role not found")
+        );
 
         User user = userMapper.toEntity(userRequest);
         user.setPassword(passwordEncoder.encode(userRequest.password()));
@@ -61,5 +62,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return jwtTokenUtil.generateToken(user);
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        User user = userRepo.findById(id).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+
+        userRepo.delete(user);
     }
 }

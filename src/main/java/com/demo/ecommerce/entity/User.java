@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +32,7 @@ public class User implements UserDetails {
     @Column(name="password",length = 100,nullable = false)
     private String password;
 
-    @Column(name="phone_number",length = 10, nullable = false,unique = true)
+    @Column(name="phone_number",length = 10,unique = true)
     private String phoneNumber;
     
     @Column(name="email")
@@ -46,6 +47,9 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn(name="role_id")
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Order> orders = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

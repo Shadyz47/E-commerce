@@ -29,6 +29,8 @@ public record OrderRequest(
         @NotBlank(message = "you must fill payment method")
         String paymentMethod,
 
+        Long userId,
+
         List<OrderDetailRequest> orderDetails
 ) {
 }

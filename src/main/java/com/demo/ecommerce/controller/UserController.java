@@ -6,12 +6,11 @@ import com.demo.ecommerce.dto.request.UserLoginRequest;
 import com.demo.ecommerce.dto.request.UserRequest;
 import com.demo.ecommerce.dto.response.UserResponse;
 import com.demo.ecommerce.service.UserService;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/api/users")
@@ -37,4 +36,13 @@ public class UserController extends BaseController {
         String token = userService.login(userLoginRequest);
         return new ResponseEntity<>(ApiResponse.loginSuccess(token), HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String>  deleteUserId(@PathVariable Long id){
+
+        userService.deleteUserById(id);
+
+        return new ResponseEntity<>("User with id " + id + " deleted successfully", HttpStatus.OK);
+    }
+
 }

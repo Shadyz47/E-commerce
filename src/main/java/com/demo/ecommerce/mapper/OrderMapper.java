@@ -16,6 +16,7 @@ public interface OrderMapper {
     OrderResponse toResponse(Order order);
     List<OrderResponse> toResponseList(List<Order> orders);
 
+    @Mapping(source = "userId", target = "user.id")
     Order toEntity(OrderRequest orderRequest);
     List<Order> toEntityList(List<OrderRequest> orderRequests);
 
