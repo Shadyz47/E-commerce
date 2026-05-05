@@ -2,13 +2,11 @@ package com.demo.ecommerce.service.impl;
 
 import com.demo.ecommerce.dto.request.OrderRequest;
 import com.demo.ecommerce.dto.response.OrderResponse;
-import com.demo.ecommerce.entity.Order;
-import com.demo.ecommerce.entity.OrderDetail;
-import com.demo.ecommerce.entity.OrderStatus;
-import com.demo.ecommerce.entity.Product;
+import com.demo.ecommerce.entity.*;
 import com.demo.ecommerce.mapper.OrderMapper;
 import com.demo.ecommerce.repository.OrderRepo;
 import com.demo.ecommerce.repository.ProductRepo;
+import com.demo.ecommerce.repository.UserRepo;
 import com.demo.ecommerce.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -21,17 +19,18 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepo orderRepo;
     private final OrderMapper orderMapper;
     private final ProductRepo productRepo;
+    private final UserRepo userRepo;
 
-    public OrderServiceImpl(OrderRepo orderRepo, OrderMapper orderMapper, ProductRepo productRepo) {
+    public OrderServiceImpl(OrderRepo orderRepo, OrderMapper orderMapper, ProductRepo productRepo, UserRepo userRepo) {
         this.orderRepo = orderRepo;
         this.orderMapper = orderMapper;
         this.productRepo = productRepo;
+        this.userRepo = userRepo;
     }
 
 
     @Override
     public List<OrderResponse> getAllOrders() {
-
 
         List<Order> orders = orderRepo.findAllWithQuery();
 
@@ -43,6 +42,9 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse placeOrder(OrderRequest orderRequest) {
 
         Order order = orderMapper.toEntity(orderRequest);
+
+        Long userId = order.getUser().getId();
+        User userDb = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         order.setOrderDate(java.time.LocalDate.now());
         order.setStatus(OrderStatus.PENDING);
@@ -142,5 +144,12 @@ public class OrderServiceImpl implements OrderService {
 
         existeOrder.getOrderDetails().clear();
         orderRepo.delete(existeOrder);
+    }
+
+    @Override
+    public OrderResponse getOrderByUserId(Long userId) {
+        Order order = orderRepo.findByUserId(userId).orElseThrow(() -> new RuntimeException("Order not found"));
+
+        return orderMapper.toResponse(order);
     }
 }

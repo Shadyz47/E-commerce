@@ -1,9 +1,12 @@
 package com.demo.ecommerce.controller;
 
 import com.demo.ecommerce.dto.request.CategoryRequest;
+import com.demo.ecommerce.dto.response.CategoryResponse;
 import com.demo.ecommerce.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -38,5 +41,11 @@ public class CategoryController {
         categoryService.deleteCategory(id);
 
         return ResponseEntity.ok("Category deleted successfully with id" + id);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(){
+
+        return null;
     }
 }

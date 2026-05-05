@@ -6,11 +6,14 @@ import com.demo.ecommerce.dto.request.UserLoginRequest;
 import com.demo.ecommerce.dto.request.UserRequest;
 import com.demo.ecommerce.dto.response.UserResponse;
 import com.demo.ecommerce.service.UserService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/api/users")
@@ -23,7 +26,7 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody UserRequest userRequest){
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequest userRequest){
 
         UserResponse userReponse = userService.register(userRequest);
 
@@ -45,4 +48,19 @@ public class UserController extends BaseController {
         return new ResponseEntity<>("User with id " + id + " deleted successfully", HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers(){
+
+        List<UserResponse> userResponse = userService.getAllUsers();
+
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id){
+
+        UserResponse user = userService.getUser(id);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 }

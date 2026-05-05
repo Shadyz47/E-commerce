@@ -23,18 +23,21 @@ public class ApplicationInitConfig {
     }
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepo userRepo) {
+    public ApplicationRunner applicationRunner(UserRepo userRepo) {
         return args -> {
 
-            Role role = roleRepo.findByRoleName(Role.ADMIN).orElseThrow(
-                    () -> new RuntimeException("Role not found")
-            );
+            if(userRepo.findByUserName("admin").isEmpty()) {
 
-            userRepo.save(User.builder()
-                    .userName("admin")
-                    .password(passwordEncoder.encode("admin"))
-                    .role(role)
-                    .build());
+                Role role = roleRepo.findByRoleName(Role.ADMIN).orElseThrow(
+                        () -> new RuntimeException("Role not found")
+                );
+
+                userRepo.save(User.builder()
+                        .userName("admin")
+                        .password(passwordEncoder.encode("admin"))
+                        .role(role)
+                        .build());
+            }
         };
     }
 }

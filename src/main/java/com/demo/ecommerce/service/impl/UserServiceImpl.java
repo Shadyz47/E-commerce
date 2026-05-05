@@ -10,8 +10,12 @@ import com.demo.ecommerce.repository.RoleRepo;
 import com.demo.ecommerce.repository.UserRepo;
 import com.demo.ecommerce.security.JwtTokenUtil;
 import com.demo.ecommerce.service.UserService;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -71,5 +75,23 @@ public class UserServiceImpl implements UserService {
         );
 
         userRepo.delete(user);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> getAllUsers() {
+
+        List<User> users = userRepo.findAllWithQuery();
+
+        return users.stream().map(userMapper::toResponse).toList();
+    }
+
+    @Override
+    @PostAuthorize("returnObject.userName() == authentication.name")
+    public UserResponse getUser(Long id) {
+
+        return userMapper.toResponse(userRepo.findById(id).orElseThrow(
+                () -> new RuntimeException("User not found")
+        ));
     }
 }

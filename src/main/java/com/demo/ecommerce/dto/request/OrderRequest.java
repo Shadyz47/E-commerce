@@ -1,8 +1,6 @@
 package com.demo.ecommerce.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 import java.util.Date;
@@ -29,6 +27,8 @@ public record OrderRequest(
         @NotBlank(message = "you must fill payment method")
         String paymentMethod,
 
+        @NotNull(message = "you must fill user id")
+        @Min(value = 1, message = "user id must be greater than or equal to 1")
         Long userId,
 
         List<OrderDetailRequest> orderDetails

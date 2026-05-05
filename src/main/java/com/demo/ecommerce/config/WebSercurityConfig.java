@@ -1,10 +1,12 @@
 package com.demo.ecommerce.config;
 
+import com.demo.ecommerce.entity.Role;
 import com.demo.ecommerce.security.JwtFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class WebSercurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {"/api/users/login", "/api/users/register"};
@@ -32,6 +35,12 @@ public class WebSercurityConfig {
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories", "/api/products", "/api/products/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").hasRole(Role.USER)
+                        .requestMatchers(HttpMethod.GET,"/api/orders/user/**").hasRole(Role.USER)
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole(Role.USER)
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole(Role.ADMIN)
+                        .requestMatchers(HttpMethod.DELETE,"/api/users/**").hasAnyRole(Role.ADMIN)
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
