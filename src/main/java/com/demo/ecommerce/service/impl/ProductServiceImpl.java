@@ -1,15 +1,19 @@
 package com.demo.ecommerce.service.impl;
 
 import com.demo.ecommerce.dto.request.ProductRequest;
+import com.demo.ecommerce.dto.response.PageResponse;
 import com.demo.ecommerce.dto.response.ProductResponse;
 import com.demo.ecommerce.entity.Category;
 import com.demo.ecommerce.entity.Product;
 import com.demo.ecommerce.entity.ProductImage;
+import com.demo.ecommerce.mapper.PageMapper;
 import com.demo.ecommerce.mapper.ProductMapper;
 import com.demo.ecommerce.repository.CategoryRepo;
 import com.demo.ecommerce.repository.ProductImageRepo;
 import com.demo.ecommerce.repository.ProductRepo;
 import com.demo.ecommerce.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,12 +28,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final CategoryRepo categoryRepo;
     private final ProductImageRepo productImageRepo;
+    private final PageMapper pageMapper;
 
-    public ProductServiceImpl(ProductRepo productRepo, ProductMapper productMapper, CategoryRepo categoryRepo, ProductImageRepo productImageRepo) {
+    public ProductServiceImpl(ProductRepo productRepo, ProductMapper productMapper, CategoryRepo categoryRepo, ProductImageRepo productImageRepo, PageMapper pageMapper) {
         this.productRepo = productRepo;
         this.productMapper = productMapper;
         this.categoryRepo = categoryRepo;
         this.productImageRepo = productImageRepo;
+        this.pageMapper = pageMapper;
     }
 
     @Override
@@ -69,10 +75,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getProducts() {
-        List<Product> products = productRepo.findAllWithQuery();
+    public PageResponse<ProductResponse> getProducts(Pageable pageable, String name) {
+        //Page<Product> products = productRepo.findAllWithQuery();
 
-        return products.stream().map(productMapper::toResponse).toList();
+        Page<Product> products = productRepo.findAll(pageable);
+        return pageMapper.toPagedResponse(products);
     }
 
     @Override

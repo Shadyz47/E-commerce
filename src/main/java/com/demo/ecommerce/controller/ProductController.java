@@ -3,6 +3,7 @@ package com.demo.ecommerce.controller;
 import com.demo.ecommerce.common.ApiResponse;
 import com.demo.ecommerce.common.BaseController;
 import com.demo.ecommerce.dto.request.ProductRequest;
+import com.demo.ecommerce.dto.response.PageResponse;
 import com.demo.ecommerce.dto.response.ProductResponse;
 import com.demo.ecommerce.entity.Currency;
 import com.demo.ecommerce.entity.Product;
@@ -10,6 +11,11 @@ import com.demo.ecommerce.mapper.ProductMapper;
 import com.demo.ecommerce.service.ProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +39,20 @@ public class ProductController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProducts(){
+    public ResponseEntity<ApiResponse<PageResponse<ProductResponse>>> getProducts(
+            @RequestParam(name="page_no", defaultValue = "0") int page,
+            @RequestParam(name = "page_size", defaultValue = "5") int size,
+            @RequestParam(name = "sort_by", defaultValue = "id") String sortBy,
+            @RequestParam(name = "sort_dir", defaultValue = "asc") String sortDir,
+            @RequestParam(name = "name", required = false) String name
+    ){
+        Sort sort = sortDir.equalsIgnoreCase("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
 
-        return new ResponseEntity<>(foundResponse(productService.getProducts()), HttpStatus.OK);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return new ResponseEntity<>(foundResponse(productService.getProducts(pageable ,name)), HttpStatus.OK);
     }
 
     @PostMapping
