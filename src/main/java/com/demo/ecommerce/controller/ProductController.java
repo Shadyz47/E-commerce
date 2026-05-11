@@ -7,11 +7,12 @@ import com.demo.ecommerce.dto.response.PageResponse;
 import com.demo.ecommerce.dto.response.ProductResponse;
 import com.demo.ecommerce.entity.Currency;
 import com.demo.ecommerce.entity.Product;
+import com.demo.ecommerce.entity.ProductImage;
 import com.demo.ecommerce.mapper.ProductMapper;
+import com.demo.ecommerce.repository.ProductImageRepo;
 import com.demo.ecommerce.service.ProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -32,15 +32,17 @@ public class ProductController extends BaseController {
 
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final ProductImageRepo productImageRepo;
 
-    public ProductController(ProductService productService, ProductMapper productMapper) {
+    public ProductController(ProductService productService, ProductMapper productMapper, ProductImageRepo productImageRepo) {
         this.productService = productService;
         this.productMapper = productMapper;
+        this.productImageRepo = productImageRepo;
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<ProductResponse>>> getProducts(
-            @RequestParam(name="page_no", defaultValue = "0") int page,
+            @RequestParam(name="page_no", defaultValue = "1") int page,
             @RequestParam(name = "page_size", defaultValue = "5") int size,
             @RequestParam(name = "sort_by", defaultValue = "id") String sortBy,
             @RequestParam(name = "sort_dir", defaultValue = "asc") String sortDir,
@@ -99,6 +101,34 @@ public class ProductController extends BaseController {
         ProductResponse productResponse = productMapper.toResponse(p);
 
         return new ResponseEntity<>(foundResponse(productResponse), HttpStatus.OK);
+    }
+
+//    @GetMapping("/{id}/image")
+//    public ResponseEntity<byte[]> getProductImage(@PathVariable Long id) {
+//        ProductImage productImage = productImageRepo.findFirstByProductIdOrderByIdAsc(id);
+//
+//        if (productImage == null || productImage.getImageData() == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+//        if (productImage.getImageType() != null && !productImage.getImageType().isBlank()) {
+//            mediaType = MediaType.parseMediaType(productImage.getImageType());
+//        }
+//
+//        return ResponseEntity.ok().contentType(mediaType).body(productImage.getImageData());
+//    }
+
+    @GetMapping("/{productId}/images/{imageId}")
+    public ResponseEntity<byte[]> getProductImageById(@PathVariable Long productId, @PathVariable Long imageId) {
+        ProductImage productImage = productImageRepo.findByIdAndProductId(imageId, productId);
+
+        if (productImage == null || productImage.getImageData() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        else{
+            return ResponseEntity.ok().body(productImage.getImageData());
+        }
     }
 
     //khoi tao fake product

@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
                    .product(productDb)
                    .build();
 
-           productImageRepo.save(productImage);
+            productImageRepo.save(productImage);
         }
     }
 
